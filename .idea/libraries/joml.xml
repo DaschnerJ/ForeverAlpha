@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="joml">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/libs/joml-1.9.9.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$PROJECT_DIR$/libs/docs/joml-1.9.9-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/libs/sources/joml-1.9.9-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
