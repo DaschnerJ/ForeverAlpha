@@ -1,7 +1,12 @@
 package practice;
 
+import practice.graphics.Screen;
+
 import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferStrategy;
+import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferInt;
 
 /**
  * This is just practice to learn OpenGL and test out things.
@@ -24,11 +29,23 @@ public class Game extends Canvas implements Runnable{
     //Game window.
     private JFrame frame;
 
+    //We create a screen to handle the pixel map.
+    private Screen screen;
+
+    //Our final rendered image view.
+    private BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+    //We create an array to store the new image's RGB values to be modified and displayed.
+    private int[] pixels = ((DataBufferInt)image.getRaster().getDataBuffer()).getData();
+
     public Game()
     {
         //Sets window's size.
         Dimension size = new Dimension(width*scale, height*scale);
         setPreferredSize(size);
+
+        //We initialize the screen to handle the pixel map here since dimensions should be set before this point.
+        screen = new Screen(width, height);
+
         //Create the window.
         frame = new JFrame();
     }
@@ -57,6 +74,64 @@ public class Game extends Canvas implements Runnable{
         }
     }
 
+    public void update()
+    {
+
+    }
+
+    /**
+     * The part we have to think about here is the buffer strategy. How do we want to take a rendered image and
+     * display the image?
+     *
+     * We take the frame and calculate it and then store the created frame. Then we hold the frame in memory in
+     * ordered to be rendered at a later date. This way we create a buffer to make the game view smoother. Most
+     * games run at an actual frame of 20-30 frames but to handle higher rate of change, the frame rate will be
+     * 60 FPS. Most common screens can only handle 60 FPS so anything higher than this does not affect much other
+     * than mouse movement...
+     *
+     * Later on I will probably rewrite this to be handled by OpenGL as this seems to be the only part that is
+     * really affected by this. And since this is a 2D game and particles and ect will probably come later, we
+     * will simply skip using GPU since it is not resource heavy yet.
+     */
+    public void render()
+    {
+        //We use a built in Java Buffer Strategy from canvas.
+        BufferStrategy bs = getBufferStrategy();
+
+        //We do not want to create a buffer each and every time. So we only create the Buffer Strategy if
+        //it does not exist. We use '3' because we want triple buffering for smoother graphics. This also
+        //allows to take advantage of threading capabilities so while we wait to display we can calculate
+        //the next frame. Anything higher does not matter.
+        if(bs == null) {
+            createBufferStrategy(3);
+            return;
+        }
+        //We remove old image before showing the new image.
+        screen.clear();
+        //We swap the new screen in.
+        screen.render();
+        //We copy the screen's calculated int array to the current game screen to be rendered.
+        for(int i = 0; i < pixels.length; i++)
+        {
+            pixels[i] = screen.pixels[i];
+        }
+        //We get graphics to be able to draw to screen with the current buffer we are using.
+        Graphics g = bs.getDrawGraphics();
+        //All graphics we want to draw MUST be drawn here. Let's not repeat Hafen...
+        {
+//            //Sets the color to paint with.
+//            g.setColor(Color.BLACK);
+//            //We draw a black background just to have a base template for the background of the game.
+//            g.fillRect(0, 0, getWidth(), getHeight());
+            //Draw the image to the screen.
+            g.drawImage(image, 0, 0, getWidth(), getHeight(), null);
+        }
+        //Removes old frames for garbage collection and free memory. Also prevents overloads and crashes...
+        g.dispose();
+        //This will sho the next calculated buffer.
+        bs.show();
+    }
+
     public static void main(String[] args)
     {
         Game game = new Game();
@@ -81,10 +156,36 @@ public class Game extends Canvas implements Runnable{
 
     @Override
     public void run() {
+        //We get the system time to control the speed of the game update and normalize game speed
+        //across computers.
+        long lastTime = System.nanoTime();
+        //We now convert nanoseconds into milliseconds. The dividing number is the frame rate limiter.
+        //In this case we are limiting it to 60.
+        final double ns = 1000000000.0 / 60.0;
+        //Measure change in time.
+        double delta = 0;
         //Main game loop.
         while(running)
         {
-            System.out.println("Running...");
+            //Get new system time to see change in time.
+            long now = System.nanoTime();
+            //Add the change in time.
+            delta += (now-lastTime) / ns;
+            //Update the last time for the next difference in time.
+            lastTime = now;
+            //If the time is great enough difference, calculate the difference.  
+            while(delta >= 1)
+            {
+                //A game tick.
+                update();
+                delta--;
+            }
+            //Render graphics
+            render();
+            //System.out.println("Running...");
         }
+
+        //Program is done.
+        stop();
     }
 }
