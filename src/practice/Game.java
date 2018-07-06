@@ -1,6 +1,7 @@
 package practice;
 
 import practice.graphics.Screen;
+import practice.input.Keyboard;
 
 import javax.swing.*;
 import java.awt.*;
@@ -29,8 +30,12 @@ public class Game extends Canvas implements Runnable{
     //Game window.
     private JFrame frame;
 
+    private Keyboard key;
+
     //We create a screen to handle the pixel map.
     private Screen screen;
+
+    public static String title = "ForeverAlpha";
 
     //Our final rendered image view.
     private BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
@@ -48,6 +53,10 @@ public class Game extends Canvas implements Runnable{
 
         //Create the window.
         frame = new JFrame();
+
+        key = new Keyboard();
+        addKeyListener(key);
+
     }
 
     //We synchronize this thread with the game thread in order to keep consistency
@@ -74,9 +83,15 @@ public class Game extends Canvas implements Runnable{
         }
     }
 
+    int x = 0;
+    int y = 0;
     public void update()
     {
-
+        key.update();
+        if(key.up) y++;
+        if(key.down) y--;
+        if(key.left) x++;
+        if(key.right)  x--;
     }
 
     /**
@@ -109,7 +124,7 @@ public class Game extends Canvas implements Runnable{
         //We remove old image before showing the new image.
         screen.clear();
         //We swap the new screen in.
-        screen.render();
+        screen.render(0 + x, 0 + y);
         //We copy the screen's calculated int array to the current game screen to be rendered.
         for(int i = 0; i < pixels.length; i++)
         {
@@ -139,8 +154,8 @@ public class Game extends Canvas implements Runnable{
         //(We are not dealing with this shit.)
         game.frame.setResizable(false);
         //Set the title of the window.
-        game.frame.setTitle("Red's Practice Game");
-        //We are addin the canvas to the game.
+        game.frame.setTitle(title);
+        //We are adding the canvas to the game.
         game.frame.add(game);
         //Sizes the game frame to the correct size.
         game.frame.pack();
@@ -159,11 +174,18 @@ public class Game extends Canvas implements Runnable{
         //We get the system time to control the speed of the game update and normalize game speed
         //across computers.
         long lastTime = System.nanoTime();
+        long timer = System.currentTimeMillis();
         //We now convert nanoseconds into milliseconds. The dividing number is the frame rate limiter.
         //In this case we are limiting it to 60.
         final double ns = 1000000000.0 / 60.0;
         //Measure change in time.
         double delta = 0;
+        //Counts how many frames we actually rendered per second.
+        int frames = 0;
+        //Counts how many times we actually update the game. This should always be 60.
+        int updates = 0;
+        //To focus and click into the canvas to allow opening and using the game immediately.
+        requestFocus();
         //Main game loop.
         while(running)
         {
@@ -173,15 +195,27 @@ public class Game extends Canvas implements Runnable{
             delta += (now-lastTime) / ns;
             //Update the last time for the next difference in time.
             lastTime = now;
-            //If the time is great enough difference, calculate the difference.  
+            //If the time is great enough difference, calculate the difference.
             while(delta >= 1)
             {
                 //A game tick.
                 update();
+                updates++;
                 delta--;
             }
             //Render graphics
             render();
+            frames++;
+            //Reset the variables each second.
+            if(System.currentTimeMillis() - timer > 1000)
+            {
+                //Add the difference to prevent this from running again.
+                timer += 1000;
+                System.out.println(updates + " ups, " + frames + " fps");
+                frame.setTitle(title + " | " + updates + " ups, " + frames + " fps");
+                updates = 0;
+                frames = 0;
+            }
             //System.out.println("Running...");
         }
 
