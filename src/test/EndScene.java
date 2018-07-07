@@ -15,7 +15,7 @@ public class EndScene extends Scene {
 	@Override
 	void tick() {
 		//Stops the running of the current scene. Simply comment this out to stop the game from shutting itself down.
-		stop();
+		//stop();
 	}
 
 	@Override
@@ -26,7 +26,7 @@ public class EndScene extends Scene {
 
 	@Override
 	void onStop() {
-		System.out.println("EndScene: This scene is stopping the program!");
+		log("This scene is stopping the program!");
 	}
 
 }

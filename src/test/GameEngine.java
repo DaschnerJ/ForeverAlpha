@@ -95,7 +95,8 @@ public class GameEngine {
 		// bindings available for use.
 		GL.createCapabilities();
 
-		// Set the clear color
+		// Set the clear color. This is to say that when the screen is being rendered, this color will overwrite
+		// the existing content.
 		glClearColor(1, 0, 0, 0.0f);
 
 		GLFW.glfwSetWindowCloseCallback(windowID, new GLFWWindowCloseCallback() {

@@ -104,7 +104,6 @@ public abstract class Scene {
 	public void stop()
 	{
 		running = false;
-		onStop();
 	}
 
 	//Gets the window associated with this scene.
@@ -147,5 +146,16 @@ public abstract class Scene {
 
 	public boolean hasStarted() {
 		return hasStarted;
+	}
+
+	//Logs info to the debug console, making it clearly identifiable.
+	public void log(String info)
+	{
+		System.out.println(this.getClass().getSimpleName() + ": " + info);
+	}
+
+	public void log(Number number)
+	{
+		System.out.println(this.getClass().getSimpleName() + ": " + number);
 	}
 }
