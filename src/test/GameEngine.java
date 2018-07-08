@@ -1,10 +1,8 @@
 package test;
 
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.lwjgl.Version;
-import org.lwjgl.glfw.GLFW;
-import org.lwjgl.glfw.GLFWErrorCallback;
-import org.lwjgl.glfw.GLFWVidMode;
-import org.lwjgl.glfw.GLFWWindowCloseCallback;
+import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.system.MemoryStack;
 
@@ -12,7 +10,9 @@ import java.nio.IntBuffer;
 
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
+import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
 import static org.lwjgl.opengl.GL11.glClearColor;
+import static org.lwjgl.opengl.GL11.glEnable;
 import static org.lwjgl.system.MemoryStack.stackPush;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
@@ -48,8 +48,9 @@ public class GameEngine {
 		glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE); // the window will be resizable
 
 
+
 		// Create the window
-		long windowID = glfwCreateWindow(300, 300, name, NULL, NULL);
+		long windowID = glfwCreateWindow(600, 600, name, NULL, NULL);
 		if ( windowID == NULL )
 			throw new RuntimeException("Failed to create the GLFW window");
 
@@ -83,7 +84,7 @@ public class GameEngine {
 		// Make the OpenGL context current
 		glfwMakeContextCurrent(windowID);
 		// Enable v-sync
-		glfwSwapInterval(1);
+		//glfwSwapInterval(1);
 
 		// Make the window visible
 		glfwShowWindow(windowID);
@@ -95,10 +96,14 @@ public class GameEngine {
 		// bindings available for use.
 		GL.createCapabilities();
 
+		//Tells OpenGL that we intend to use 2D textures.
+		glEnable(GL_TEXTURE_2D);
+
 		// Set the clear color. This is to say that when the screen is being rendered, this color will overwrite
 		// the existing content.
-		glClearColor(1, 0, 0, 0.0f);
+		glClearColor(0, 0, 0, 0.0f);
 
+		//This callback is called when the glfw is
 		GLFW.glfwSetWindowCloseCallback(windowID, new GLFWWindowCloseCallback() {
 			@Override
 			public void invoke(long window) {
@@ -110,7 +115,23 @@ public class GameEngine {
 			}
 		});
 
-		sceneManager.start(new StartScene(60,120, this));
+		//Example of mouse input callback
+
+		glfwSetCursorPosCallback(windowID, new GLFWCursorPosCallback() {
+			@Override
+			public void invoke(long window, double xpos, double ypos) {
+
+			}
+		});
+
+		glfwSetMouseButtonCallback(windowID, new GLFWMouseButtonCallback() {
+			@Override
+			public void invoke(long window, int button, int action, int mods) {
+
+			}
+		});
+
+		sceneManager.start(new StartScene(60,60, this));
 	}
 
 	public SceneManager getSceneManager()

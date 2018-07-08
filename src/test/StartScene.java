@@ -18,7 +18,7 @@ public class StartScene extends Scene {
 	void tick() {
 		log(i++);
 		if(i > 20) {
-			getGameEngine().getSceneManager().switchScene(new EndScene(getTPS(), 60, getGameEngine()));
+			getGameEngine().getSceneManager().switchScene(new EndScene(60, 60, getGameEngine()));
 			//Here to showcase that the final tick is finished before switching to another scene.
 			System.out.println("StartScene: This tick is being finished.");
 		}

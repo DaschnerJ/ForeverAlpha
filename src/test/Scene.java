@@ -17,6 +17,12 @@ public abstract class Scene {
 	//Time, in seconds, that it should take per tick/frame
 	private double targetTPS;
 	private double targetFPS;
+
+	private int frames;
+	private double lastFrameCount;
+
+	private double fps;
+
 	//Whether the scene is running or not
 	private boolean running;
 	//Whether the scene has started or not
@@ -32,6 +38,8 @@ public abstract class Scene {
 		this.windowID = window.getID();
 		this.targetTPS = 1/targetTPS;
 		this.targetFPS = 1/targetFPS;
+		this.frames = 0;
+		this.fps = 0;
 		this.gameEngine = gameEngine;
 		refreshTime();
 		running = false;
@@ -53,30 +61,38 @@ public abstract class Scene {
 			glfwPollEvents();
 
 			//Runs ticks when ticks are due
-			if(time - lastUpdate > targetTPS) {
+			if(time - lastUpdate >= targetTPS) {
 				int caughtUpTicks = 0;
 				//Attempts to tick up to 10 times before giving up and skipping ticks
-				while(time - lastUpdate > targetTPS && caughtUpTicks++ < 10 && running) {
+				while(time - lastUpdate >= targetTPS && caughtUpTicks++ < 10 && running) {
 					tick();
 					lastUpdate += targetTPS;
 				}
 				//Skips all ticks up to the current moment so that the gameEngine may catch up
-				if(caughtUpTicks == 10 && time - lastUpdate > targetTPS)
-					lastUpdate += ((int) ((time - lastUpdate) / targetTPS));
+				if(caughtUpTicks == 10 && time - lastUpdate >= targetTPS)
+					lastUpdate += ((long) ((time - lastUpdate) / targetTPS));
 			}
 
 			//Renders when a render is due
-			if(time - lastFrame > targetFPS) {
+			if(time - lastFrame >= targetFPS && running) {
 				render();
+				lastFrame += targetFPS;
+				frames++;
 
 				/*Does not attempt to catch up frames if frames are past due,
 				  as re-rendering without gameEngine change (ticks) has no benefit
 
-				  Therefore, skips all frames due up to last frame due*/
-				if(time - lastFrame > targetFPS)
-					lastFrame += ((int)((time - lastFrame) / targetFPS));
+				  Therefore, skips all frames due up to current date*/
+				if(time - lastFrame >= targetFPS)
+					lastFrame = time;
 			}
 
+			if(time - lastFrameCount >= 1d)
+			{
+				fps = Math.round((frames + fps) /2);
+				frames = 0;
+				lastFrameCount += 1d;
+			}
 
 			try {
 				//Sleeps minimum time possible.
@@ -124,6 +140,7 @@ public abstract class Scene {
 		updateTime();
 		lastUpdate = time - this.targetTPS;
 		lastFrame = time - this.targetFPS;
+		lastFrameCount = time;
 	}
 
 	//Turns current time into a double from ultra precise nano seconds. Aka 5.23 billion nanoseconds = 5.23 seconds.
@@ -158,4 +175,10 @@ public abstract class Scene {
 	{
 		System.out.println(this.getClass().getSimpleName() + ": " + number);
 	}
+
+	public double getCurrentFPS()
+	{
+		return fps;
+	}
+
 }
