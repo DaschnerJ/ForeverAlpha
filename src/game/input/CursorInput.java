@@ -15,7 +15,7 @@ public class CursorInput extends GLFWCursorPosCallback {
     @Override
     public void invoke(long window, double x, double y)
     {
-        System.out.println("X: " + x + "Y: " + y);
+        //System.out.println("X: " + x + ", Y: " + y);
         menuMouseListener.checkMouse((int)x, (int)y);
 
     }

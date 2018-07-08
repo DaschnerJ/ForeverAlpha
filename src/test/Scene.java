@@ -18,8 +18,10 @@ public abstract class Scene {
 	private double targetTPS;
 	private double targetFPS;
 
+	private int ticks;
 	private int frames;
 	private double lastFrameCount;
+	private boolean capFPS;
 
 	private double fps;
 
@@ -39,7 +41,9 @@ public abstract class Scene {
 		this.targetTPS = 1/targetTPS;
 		this.targetFPS = 1/targetFPS;
 		this.frames = 0;
+		this.ticks = 0;
 		this.fps = 0;
+		this.capFPS = true;
 		this.gameEngine = gameEngine;
 		refreshTime();
 		running = false;
@@ -66,6 +70,7 @@ public abstract class Scene {
 				//Attempts to tick up to 10 times before giving up and skipping ticks
 				while(time - lastUpdate >= targetTPS && caughtUpTicks++ < 10 && running) {
 					tick();
+					ticks++;
 					lastUpdate += targetTPS;
 				}
 				//Skips all ticks up to the current moment so that the gameEngine may catch up
@@ -74,7 +79,7 @@ public abstract class Scene {
 			}
 
 			//Renders when a render is due
-			if(time - lastFrame >= targetFPS && running) {
+			if(((time - lastFrame >= targetFPS) || (!capFPS)) && running) {
 				render();
 				lastFrame += targetFPS;
 				frames++;
@@ -150,9 +155,9 @@ public abstract class Scene {
 		time = System.nanoTime() / 1000000000d;
 	}
 
-	//Get the current TPS. This is actually the time it takes for a tick to pass, rather than the number of ticks/s.
+	//Get the set TPS.
 	public double getTPS() {
-		return targetTPS;
+		return 1/targetTPS;
 	}
 
 	/*Gets the game engine associated with this scene. The game engine provides access to all the systems, like audio
@@ -179,6 +184,16 @@ public abstract class Scene {
 	public double getCurrentFPS()
 	{
 		return fps;
+	}
+
+	public void setFPSCap(boolean cap)
+	{
+		capFPS = cap;
+	}
+
+	public int getTicksSinceStart()
+	{
+		return ticks;
 	}
 
 }

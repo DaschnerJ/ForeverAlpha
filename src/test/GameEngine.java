@@ -32,7 +32,7 @@ public class GameEngine {
 
 		sceneManager = new SceneManager();
 
-		start("yeeter");
+		start("ForeverAlpha");
 
 		if(window != null)
 			glfwSetWindowShouldClose(window.getID(), true);

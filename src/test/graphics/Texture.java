@@ -46,6 +46,8 @@ public class Texture {
 
 		//Gives OpenGL the image we loaded up above and tells it to store it in memory for quick reference later.
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, this.width, this.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixelData);
+		//Unbinds the texture so it will no longer be used
+		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
 	//Creates a new texture. Uses the given string to resolve a file path.
