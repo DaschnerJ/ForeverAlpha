@@ -1,4 +1,4 @@
-package game.components.menu.Input;
+package game.input;
 
 import game.components.menu.MenuComponent;
 
@@ -56,5 +56,15 @@ public class MenuMouseListener {
         if(orgX < px && orgY < py && y > py && x > px)
             return true;
         else return false;
+    }
+
+    public void setInactive()
+    {
+        active = false;
+    }
+
+    public void setActive()
+    {
+        active = true;
     }
 }

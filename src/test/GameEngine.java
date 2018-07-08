@@ -1,7 +1,6 @@
 package test;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
-import game.components.menu.Input.CursorInput;
+import game.input.CursorInput;
 import org.lwjgl.Version;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.GL;
