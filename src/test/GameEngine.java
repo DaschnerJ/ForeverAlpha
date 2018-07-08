@@ -123,12 +123,12 @@ public class GameEngine {
 
 		//Example of mouse input callback
 
-		glfwSetCursorPosCallback(windowID, new GLFWCursorPosCallback() {
-			@Override
-			public void invoke(long window, double xpos, double ypos) {
-
-			}
-		});
+//		glfwSetCursorPosCallback(windowID, new GLFWCursorPosCallback() {
+//			@Override
+//			public void invoke(long window, double xpos, double ypos) {
+//
+//			}
+//		});
 
 		glfwSetMouseButtonCallback(windowID, new GLFWMouseButtonCallback() {
 			@Override
