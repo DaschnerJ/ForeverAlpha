@@ -1,6 +1,7 @@
 package test;
 
 import com.sun.org.apache.xpath.internal.operations.Bool;
+import game.components.menu.Input.CursorInput;
 import org.lwjgl.Version;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.GL;
@@ -20,6 +21,8 @@ public class GameEngine {
 
 	private SceneManager sceneManager;
 	private Window window;
+
+    private GLFWCursorPosCallback cursorPos;
 
 	public void run() {
 		System.out.println("Hello LWJGL " + Version.getVersion() + "!");
@@ -55,6 +58,9 @@ public class GameEngine {
 			throw new RuntimeException("Failed to create the GLFW window");
 
 		window = new Window(windowID);
+
+
+        glfwSetCursorPosCallback(getWindow().getID(), cursorPos = new CursorInput());
 
 		// Setup a key callback. It will be called every time a key is pressed, repeated or released.
 		glfwSetKeyCallback(windowID, (wind, key, scancode, action, mods) -> {

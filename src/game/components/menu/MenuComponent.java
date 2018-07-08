@@ -2,6 +2,9 @@ package game.components.menu;
 
 import org.joml.Vector2d;
 
+import javax.swing.*;
+import java.awt.event.MouseListener;
+
 public class MenuComponent {
 
     //The ID in order to inventory all the components and keep track of them.
@@ -15,11 +18,15 @@ public class MenuComponent {
     //Is the component visible or hidden from the user?
     boolean visible;
 
+    //Frame is used in listeners to hold position of where the button should be.
+    //JFrame frame;
+
     public MenuComponent(String id, Vector2d size, Vector2d position)
     {
         this.id = id;
         this.size = size;
         this.position = position;
+
         //By default components are hidden to allow modification then display.
         visible = false;
     }
@@ -50,17 +57,37 @@ public class MenuComponent {
         return size;
     }
 
+    public int getX()
+    {
+        return (int)getPosition().x;
+    }
+
+    public int getY()
+    {
+        return (int)getPosition().y;
+    }
+
+    public int getXOff()
+    {
+        return (int)(getPosition().x + getSize().x);
+    }
+
+    public int getYOff()
+    {
+        return (int)(getPosition().y + getSize().y);
+    }
+
     public String getId()
     {
         return id;
     }
 
-    public void hide()
+    public void hideComponent()
     {
         visible = false;
     }
 
-    public void show()
+    public void showComponent()
     {
         visible = true;
     }
@@ -91,3 +118,5 @@ public class MenuComponent {
 
 
 }
+
+

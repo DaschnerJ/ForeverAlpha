@@ -2,6 +2,8 @@ package game.components.menu;
 
 import org.joml.Vector2d;
 
+import javax.swing.*;
+
 public class MenuSlider extends MenuComponent {
 
     int selected, min, max;

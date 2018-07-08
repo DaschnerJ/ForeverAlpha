@@ -2,6 +2,7 @@ package game.components.menu;
 
 import org.joml.Vector2d;
 
+import javax.swing.*;
 import java.awt.*;
 
 public class MenuButton extends MenuComponent{
@@ -31,7 +32,13 @@ public class MenuButton extends MenuComponent{
 
     public void setString(String string)
     {
-        this.text.setText(string);
+        if(text == null)
+        {
+            text = new Text(string);
+        }
+        else {
+            this.text.setText(string);
+        }
     }
 
 
