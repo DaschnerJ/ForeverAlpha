@@ -1,15 +1,15 @@
 package game.input;
 
+import game.input.listeners.MenuMouseListener;
 import org.lwjgl.glfw.GLFWCursorPosCallback;
 
 public class CursorInput extends GLFWCursorPosCallback {
 
-    MenuMouseListener menuMouseListener;
+    public static MenuMouseListener menuMouseListener;
 
     public CursorInput()
     {
         menuMouseListener = new MenuMouseListener();
-        menuMouseListener.setInactive();
     }
 
     @Override

@@ -1,8 +1,7 @@
 package game.components.menu;
 
+import game.Text;
 import org.joml.Vector2d;
-
-import javax.swing.*;
 
 public class MenuLabel extends MenuComponent{
 
@@ -20,7 +19,7 @@ public class MenuLabel extends MenuComponent{
 
     public String getString()
     {
-        return text.text;
+        return text.getText();
     }
 
     public void setText(Text text)

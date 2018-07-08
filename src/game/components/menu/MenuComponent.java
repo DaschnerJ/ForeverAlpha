@@ -1,5 +1,6 @@
 package game.components.menu;
 
+import game.input.CursorInput;
 import org.joml.Vector2d;
 
 import javax.swing.*;
@@ -21,85 +22,77 @@ public class MenuComponent {
     //Frame is used in listeners to hold position of where the button should be.
     //JFrame frame;
 
-    public MenuComponent(String id, Vector2d size, Vector2d position)
-    {
+    public MenuComponent(String id, Vector2d size, Vector2d position) {
         this.id = id;
         this.size = size;
         this.position = position;
+
+        CursorInput.menuMouseListener.addComponent(this);
 
         //By default components are hidden to allow modification then display.
         visible = false;
     }
 
-    public MenuComponent getComponent()
-    {
+    public MenuComponent getComponent() {
         return this;
     }
 
-    public void setPosition(int x, int y)
-    {
+    public void setPosition(int x, int y) {
         position = new Vector2d(x, y);
     }
 
     @Deprecated
-    public void setSize(int x, int y)
-    {
+    public void setSize(int x, int y) {
         size = new Vector2d(x, y);
     }
 
-    public Vector2d getPosition()
-    {
+    public Vector2d getPosition() {
         return position;
     }
 
-    public Vector2d getSize()
-    {
+    public Vector2d getSize() {
         return size;
     }
 
-    public int getX()
-    {
-        return (int)getPosition().x;
+    public double getX() {
+        return getPosition().x;
     }
 
-    public int getY()
-    {
-        return (int)getPosition().y;
+    public double getY() {
+        return getPosition().y;
     }
 
-    public int getXOff()
-    {
-        return (int)(getPosition().x + getSize().x);
+    public double getXOff() {
+        return (getPosition().x + getSize().x);
     }
 
-    public int getYOff()
-    {
-        return (int)(getPosition().y + getSize().y);
+    public double getYOff() {
+        return (getPosition().y + getSize().y);
     }
 
-    public String getId()
-    {
+    public String getId() {
         return id;
     }
 
-    public void hideComponent()
-    {
+    public void hideComponent() {
         visible = false;
     }
 
-    public void showComponent()
-    {
+    public void showComponent() {
         visible = true;
     }
 
-    public void mouseOn()
-    {
+    public void mouseOn() {
         //What to do when the component is moused on.
     }
 
-    public void mouseOff()
-    {
+    public void mouseOff() {
         //What to do when the component is moused off.
+    }
+
+    public void mouseClick()
+    {
+
     }
 
     public void draw()

@@ -1,8 +1,8 @@
 package game.components.menu;
 
+import game.Text;
 import org.joml.Vector2d;
 
-import javax.swing.*;
 import java.awt.*;
 
 public class MenuField extends MenuComponent{

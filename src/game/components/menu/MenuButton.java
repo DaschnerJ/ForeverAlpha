@@ -1,8 +1,10 @@
 package game.components.menu;
 
+import game.Text;
+import game.input.CursorInput;
+import game.input.listeners.MenuMouseListener;
 import org.joml.Vector2d;
 
-import javax.swing.*;
 import java.awt.*;
 
 public class MenuButton extends MenuComponent{
