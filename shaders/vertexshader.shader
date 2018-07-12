@@ -1,7 +1,14 @@
 #version 120
 
-attribute vec3 vertices;
+attribute vec2 vertices;
+attribute vec2 texture_coords;
+
+uniform mat4 projection;
+uniform vec2 texture_offset;
+
+varying vec2 out_texture_coords;
 
 void main() {
-    gl_Position = vec4(vertices, 1);
+    gl_Position = projection * vec4(vertices, 0, 1);
+    out_texture_coords = texture_coords;
 }

@@ -15,6 +15,11 @@ public class StartScene extends Scene {
 	}
 
 	@Override
+	void initialize() {
+
+	}
+
+	@Override
 	void tick() {
 		log(i++);
 		if(i > 20) {
