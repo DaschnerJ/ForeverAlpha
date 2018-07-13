@@ -1,16 +1,16 @@
 package test;
 
 import org.joml.Matrix4f;
-import test.graphics.*;
-import test.graphics.instancerendering.InstanceEntity;
+import test.graphics.Camera;
+import test.graphics.Entity;
+import test.graphics.Model;
+import test.graphics.Shader;
+import test.graphics.entitycomponents.AnimationComponent;
 import test.graphics.instancerendering.InstanceEntityRenderer;
-import test.graphics.textures.AnimatedSprite;
-import test.graphics.textures.Sprite;
 import test.graphics.textures.Texture;
 import test.graphics.textures.TextureCoords;
+import test.graphics.textures.TextureCoordsHolder;
 import test.utils.UtilsSprite;
-
-import java.util.HashMap;
 
 import static org.lwjgl.glfw.GLFW.glfwSetWindowTitle;
 import static org.lwjgl.glfw.GLFW.glfwSwapBuffers;
@@ -29,9 +29,9 @@ public class EndScene extends Scene {
 	private Shader shader;
 	private Model model;
 	private InstanceEntityRenderer entities;
-	private Sprite[] sprites;
+	private TextureCoordsHolder textureCoordsHolder;
+	private TextureCoords[] sprites;
 	private Texture texture2;
-	private AnimatedSprite animatedSprite;
 
 	public EndScene(double targetTPS, double targetFPS, GameEngine gameEngine) {
 		super(targetTPS, targetFPS, gameEngine);
@@ -56,21 +56,24 @@ public class EndScene extends Scene {
 		// 1,0, Top Right
 		// 0,1, Bottom Left
 		// 1,1, Bottom Right
-		HashMap<float[],TextureCoords> textureCoordsHashMap = new HashMap<>();
-		sprites = UtilsSprite.generateSpritesFromSpriteMap(texture2, 64, 64,textureCoordsHashMap);
+		textureCoordsHolder = new TextureCoordsHolder();
+		sprites = UtilsSprite.getTextureCoordsForSprites(textureCoordsHolder,texture2,64,64);
 		//Remember that this is used in the tick() portion of this class.
-		animatedSprite = new AnimatedSprite(textureCoordsHashMap, texture2,64,64,30f);
-		System.out.println("texcoordssize: " + textureCoordsHashMap.size());
+		System.out.println("texcoordssize: " + textureCoordsHolder.size());
 
 		entities = new InstanceEntityRenderer(model);
 		float x = 0;
 		float max = 10;
+		int number = 0;
 		while(x++ < max) {
-			InstanceEntity entity = new InstanceEntity(model, animatedSprite);
+			Entity entity = new Entity(model, texture2, sprites[number % sprites.length]);
+			AnimationComponent component = new AnimationComponent(sprites,60f);
+			component.setFrame(number++);
 			entity.setAngle((360f/max)*x);
 			entity.setSize(1.8f);
 			double radians = Math.toRadians(entity.getAngle());
 			entity.setPosition((float) (Math.cos(radians) * 3),(float) (Math.sin(radians) * 3));
+			entity.addComponent(component);
 			entities.add(entity);
 		}
 
@@ -106,8 +109,8 @@ public class EndScene extends Scene {
 			double radians = Math.toRadians(entity.getAngle() + 90);
 			entity.setPosition((float) (Math.cos(radians) * 3),(float) (Math.sin(radians) * 3));
 			entity.setSize(varyZoom.value);
+			entity.tick();
 		});
-		animatedSprite.tick();
 		//camera.setZoom(varyZoom.value);
 		//camera.setPosition(varyMove.value,0);
 		//camera.setAngle(varyRotate.value);
@@ -119,7 +122,7 @@ public class EndScene extends Scene {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
 
 		shader.bind();
-		entities.render(entity -> shader.setUniform("projection",camera.getProjectionForEntity(entity)));
+		entities.render(shader, camera);
 
 		glfwSwapBuffers(getWindowID());
 	}

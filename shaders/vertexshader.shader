@@ -4,7 +4,6 @@ attribute vec2 vertices;
 attribute vec2 texture_coords;
 
 uniform mat4 projection;
-uniform vec2 texture_offset;
 
 varying vec2 out_texture_coords;
 

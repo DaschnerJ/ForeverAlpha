@@ -1,11 +1,13 @@
 package test.graphics.instancerendering;
 
+import test.graphics.Camera;
+import test.graphics.Entity;
 import test.graphics.Model;
 import test.graphics.Shader;
 
 import java.util.ArrayList;
 
-public class InstanceEntityRenderer extends ArrayList<InstanceEntity> {
+public class InstanceEntityRenderer extends ArrayList<Entity> {
 
 	private Model model;
 
@@ -16,15 +18,14 @@ public class InstanceEntityRenderer extends ArrayList<InstanceEntity> {
 		this.model = model;
 	}
 
-	public void render(InstanceEntityCallback prerendercall)
+	public void render(Shader shader, Camera camera)
 	{
 		model.bind();
 		forEach(entity -> {
-			entity.getSprite().bind();
-			//Allows you to set uniform stuff before you render.
-			prerendercall.prerender(entity);
+			entity.getTextureCoords().bind(entity.getTexture());
+			entity.preRender(shader,camera);
 			entity.render();
-			entity.getSprite().unbind();
+			entity.getTextureCoords().unbind();
 		});
 		model.unbind();
 	}

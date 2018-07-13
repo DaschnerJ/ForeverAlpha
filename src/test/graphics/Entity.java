@@ -1,7 +1,13 @@
 package test.graphics;
 
 import org.joml.Vector2f;
-import test.graphics.textures.Sprite;
+import test.graphics.entitycomponents.CameraComponent;
+import test.graphics.entitycomponents.EntityComponent;
+import test.graphics.textures.Texture;
+import test.graphics.textures.TextureCoords;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -19,27 +25,45 @@ public class Entity {
 	//The model to use for rendering this entity.
 	private Model model;
 
-	private Sprite sprite;
+	private Texture texture;
+	private TextureCoords textureCoords;
+	private List<EntityComponent> components;
 
-	public Entity(Model model, Sprite sprite) {
+	public Entity(Model model, Texture texture, TextureCoords textureCoords) {
 		this.model = model;
-		this.sprite = sprite;
+		this.texture = texture;
+		this.textureCoords = textureCoords;
 		this.position = new Vector2f();
 		this.size = 1;
 		this.angle = 0;
+		this.components = new ArrayList<>();
+		components.add(new CameraComponent());
+	}
+
+	/**
+	 * For setting uniforms and such.
+	 */
+	public void preRender(Shader shader, Camera camera)
+	{
+		components.forEach(component -> component.render(this,shader,camera));
+	}
+
+	public void tick()
+	{
+		components.forEach(component -> component.tick(this));
 	}
 
 	public void render()
 	{
 		//Binds the texture so it is used in rendering.
-		sprite.bind();
+		textureCoords.bind(texture);
 		model.bind();
 
 		//Tells OpenGL to draw our vertices on the screen.
 		glDrawElements(GL_TRIANGLES, model.getVerticeCount(), GL_UNSIGNED_INT, 0);
 
 		model.unbind();
-		sprite.unbind();
+		textureCoords.unbind();
 	}
 
 	public Vector2f getPosition() {
@@ -89,12 +113,36 @@ public class Entity {
 		this.model = model;
 	}
 
-	public Sprite getSprite() {
-		return sprite;
+	public Texture getTexture() {
+		return texture;
 	}
 
-	public void setSprite(Sprite sprite) {
-		this.sprite = sprite;
+	public void setTexture(Texture texture) {
+		this.texture = texture;
 	}
 
+	public void setTextureCoords(TextureCoords textureCoords) {
+		this.textureCoords = textureCoords;
+	}
+
+	public TextureCoords getTextureCoords() {
+		return textureCoords;
+	}
+
+	public List<EntityComponent> getComponents() {
+		return components;
+	}
+
+	public void addComponent(EntityComponent component)
+	{
+		components.add(component);
+	}
+
+	public boolean hasComponent(Class clazz)
+	{
+		for(EntityComponent component : components)
+			if(component.getClass().equals(clazz))
+				return true;
+		return false;
+	}
 }
