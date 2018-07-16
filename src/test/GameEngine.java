@@ -49,15 +49,12 @@ public class GameEngine {
 		glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE); // the window will stay hidden after creation
 		glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE); // the window will be resizable
 
-
-
 		// Create the window
-		long windowID = glfwCreateWindow(600, 600, name, NULL, NULL);
+		long windowID = glfwCreateWindow(400, 400, name, NULL, NULL);
 		if ( windowID == NULL )
 			throw new RuntimeException("Failed to create the GLFW window");
 
 		window = new Window(windowID);
-
 
         glfwSetCursorPosCallback(getWindow().getID(), cursorPos = new CursorInput());
 
@@ -117,22 +114,6 @@ public class GameEngine {
 				// Free the window callbacks and destroy the window
 				glfwFreeCallbacks(window);
 				glfwDestroyWindow(window);
-			}
-		});
-
-		//Example of mouse input callback
-
-//		glfwSetCursorPosCallback(windowID, new GLFWCursorPosCallback() {
-//			@Override
-//			public void invoke(long window, double xpos, double ypos) {
-//
-//			}
-//		});
-
-		glfwSetMouseButtonCallback(windowID, new GLFWMouseButtonCallback() {
-			@Override
-			public void invoke(long window, int button, int action, int mods) {
-
 			}
 		});
 

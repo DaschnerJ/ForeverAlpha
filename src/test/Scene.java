@@ -55,6 +55,7 @@ public abstract class Scene {
 		running = true;
 		hasStarted = true;
 		refreshTime();
+		initialize();
 		while(running)
 		{
 			//Updates current time
@@ -111,6 +112,9 @@ public abstract class Scene {
 	public boolean isRunning() {
 		return running;
 	}
+
+	//This is called when the scene is entered.
+	abstract void initialize();
 
 	//Each scene may define what will happen in a tick
 	abstract void tick();

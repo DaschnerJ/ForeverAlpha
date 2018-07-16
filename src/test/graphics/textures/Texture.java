@@ -1,4 +1,4 @@
-package test.graphics;
+package test.graphics.textures;
 
 import org.lwjgl.BufferUtils;
 
@@ -6,14 +6,19 @@ import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 
 import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
+import static org.lwjgl.opengl.GL13.glActiveTexture;
 import static org.lwjgl.stb.STBImage.stbi_load;
 
 public class Texture {
 
 	private int id;
+	//Size, in pixels of the texture.
 	private int width;
 	private int height;
 
+	//BEWARE THAT NONLINEAR IMAGES WILL PULL PIXEL COLOR FROM SLIGHTLY OUTSIDE TEXTURE COORDS
+	//AS SUCH, THEY ARE PROBABLY BETTER USED IN ONLY ONE SPRITE
 	public Texture(String filename, boolean linear)
 	{
 		//These buffers will be filled with the width and height of the image when the function below executes.
@@ -57,8 +62,9 @@ public class Texture {
 	}
 
 	//Binds this texture, telling OpenGL that any further functions involving textures should use this texture.
-	public void bind()
+	public void bind(int sampler)
 	{
+		glActiveTexture(GL_TEXTURE0 + sampler);
 		glBindTexture(GL_TEXTURE_2D, this.id);
 	}
 
@@ -71,4 +77,7 @@ public class Texture {
 		return height;
 	}
 
+	public int getID() {
+		return id;
+	}
 }
