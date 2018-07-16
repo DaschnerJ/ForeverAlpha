@@ -20,13 +20,14 @@ package test.generation;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.Random;
 
 public class SimplexNoise {  // Simplex noise in 2D, 3D and 4D
-    private static Grad grad3[] = {new Grad(1,1,0),new Grad(-1,1,0),new Grad(1,-1,0),new Grad(-1,-1,0),
+    private Grad grad3[] = {new Grad(1,1,0),new Grad(-1,1,0),new Grad(1,-1,0),new Grad(-1,-1,0),
             new Grad(1,0,1),new Grad(-1,0,1),new Grad(1,0,-1),new Grad(-1,0,-1),
             new Grad(0,1,1),new Grad(0,-1,1),new Grad(0,1,-1),new Grad(0,-1,-1)};
 
-    private static Grad grad4[]= {new Grad(0,1,1,1),new Grad(0,1,1,-1),new Grad(0,1,-1,1),new Grad(0,1,-1,-1),
+    private Grad grad4[]= {new Grad(0,1,1,1),new Grad(0,1,1,-1),new Grad(0,1,-1,1),new Grad(0,1,-1,-1),
             new Grad(0,-1,1,1),new Grad(0,-1,1,-1),new Grad(0,-1,-1,1),new Grad(0,-1,-1,-1),
             new Grad(1,0,1,1),new Grad(1,0,1,-1),new Grad(1,0,-1,1),new Grad(1,0,-1,-1),
             new Grad(-1,0,1,1),new Grad(-1,0,1,-1),new Grad(-1,0,-1,1),new Grad(-1,0,-1,-1),
@@ -35,23 +36,23 @@ public class SimplexNoise {  // Simplex noise in 2D, 3D and 4D
             new Grad(1,1,1,0),new Grad(1,1,-1,0),new Grad(1,-1,1,0),new Grad(1,-1,-1,0),
             new Grad(-1,1,1,0),new Grad(-1,1,-1,0),new Grad(-1,-1,1,0),new Grad(-1,-1,-1,0)};
 
-    private static short p[] = {151,160,137,91,90,15,
-            131,13,201,95,96,53,194,233,7,225,140,36,103,30,69,142,8,99,37,240,21,10,23,
-            190, 6,148,247,120,234,75,0,26,197,62,94,252,219,203,117,35,11,32,57,177,33,
-            88,237,149,56,87,174,20,125,136,171,168, 68,175,74,165,71,134,139,48,27,166,
-            77,146,158,231,83,111,229,122,60,211,133,230,220,105,92,41,55,46,245,40,244,
-            102,143,54, 65,25,63,161, 1,216,80,73,209,76,132,187,208, 89,18,169,200,196,
-            135,130,116,188,159,86,164,100,109,198,173,186, 3,64,52,217,226,250,124,123,
-            5,202,38,147,118,126,255,82,85,212,207,206,59,227,47,16,58,17,182,189,28,42,
-            223,183,170,213,119,248,152, 2,44,154,163, 70,221,153,101,155,167, 43,172,9,
-            129,22,39,253, 19,98,108,110,79,113,224,232,178,185, 112,104,218,246,97,228,
-            251,34,242,193,238,210,144,12,191,179,162,241, 81,51,145,235,249,14,239,107,
-            49,192,214, 31,181,199,106,157,184, 84,204,176,115,121,50,45,127, 4,150,254,
-            138,236,205,93,222,114,67,29,24,72,243,141,128,195,78,66,215,61,156,180};
+    private short p[] = new short[256];
     // To remove the need for index wrapping, double the permutation table length
-    private static short perm[] = new short[512];
-    private static short permMod12[] = new short[512];
-    static {
+    private short perm[] = new short[512];
+    private short permMod12[] = new short[512];
+
+    private int seed;
+
+    public SimplexNoise(int seed){
+        this.seed = seed;
+        Random r = new Random(seed);
+        for(int i = 0; i < 256; i++)
+        {
+            short x = (short)r.nextInt(255);
+            p[i] = x;
+            //System.out.println("Number picked: " + x);
+        }
+
         for(int i=0; i<512; i++)
         {
             perm[i]=p[i & 255];
@@ -60,31 +61,31 @@ public class SimplexNoise {  // Simplex noise in 2D, 3D and 4D
     }
 
     // Skewing and unskewing factors for 2, 3, and 4 dimensions
-    private static final double F2 = 0.5*(Math.sqrt(3.0)-1.0);
-    private static final double G2 = (3.0-Math.sqrt(3.0))/6.0;
-    private static final double F3 = 1.0/3.0;
-    private static final double G3 = 1.0/6.0;
-    private static final double F4 = (Math.sqrt(5.0)-1.0)/4.0;
-    private static final double G4 = (5.0-Math.sqrt(5.0))/20.0;
+    private final double F2 = 0.5*(Math.sqrt(3.0)-1.0);
+    private final double G2 = (3.0-Math.sqrt(3.0))/6.0;
+    private final double F3 = 1.0/3.0;
+    private final double G3 = 1.0/6.0;
+    private final double F4 = (Math.sqrt(5.0)-1.0)/4.0;
+    private final double G4 = (5.0-Math.sqrt(5.0))/20.0;
 
     // This method is a *lot* faster than using (int)Math.floor(x)
-    private static int fastfloor(double x) {
+    private int fastfloor(double x) {
         int xi = (int)x;
         return x<xi ? xi-1 : xi;
     }
 
-    private static double dot(Grad g, double x, double y) {
+    private double dot(Grad g, double x, double y) {
         return g.x*x + g.y*y; }
 
-    private static double dot(Grad g, double x, double y, double z) {
+    private double dot(Grad g, double x, double y, double z) {
         return g.x*x + g.y*y + g.z*z; }
 
-    private static double dot(Grad g, double x, double y, double z, double w) {
+    private double dot(Grad g, double x, double y, double z, double w) {
         return g.x*x + g.y*y + g.z*z + g.w*w; }
 
 
     // 2D simplex noise
-    public static double noise(double xin, double yin) {
+    public double noise(double xin, double yin) {
         double n0, n1, n2; // Noise contributions from the three corners
         // Skew the input space to determine which simplex cell we're in
         double s = (xin+yin)*F2; // Hairy factor for 2D
@@ -139,7 +140,7 @@ public class SimplexNoise {  // Simplex noise in 2D, 3D and 4D
 
 
     // 3D simplex noise
-    public static double noise(double xin, double yin, double zin) {
+    public double noise(double xin, double yin, double zin) {
         double n0, n1, n2, n3; // Noise contributions from the four corners
         // Skew the input space to determine which simplex cell we're in
         double s = (xin+yin+zin)*F3; // Very nice and simple skew factor for 3D
@@ -221,7 +222,7 @@ public class SimplexNoise {  // Simplex noise in 2D, 3D and 4D
 
 
     // 4D simplex noise, better simplex rank ordering method 2012-03-09
-    public static double noise(double x, double y, double z, double w) {
+    public double noise(double x, double y, double z, double w) {
 
         double n0, n1, n2, n3, n4; // Noise contributions from the five corners
         // Skew the (x,y,z,w) space to determine which cell of 24 simplices we're in
@@ -338,7 +339,7 @@ public class SimplexNoise {  // Simplex noise in 2D, 3D and 4D
 
     // Inner class to speed upp gradient computations
     // (In Java, array access is a lot slower than member access)
-    private static class Grad
+    private class Grad
     {
         double x, y, z, w;
 
@@ -358,7 +359,7 @@ public class SimplexNoise {  // Simplex noise in 2D, 3D and 4D
         }
     }
 
-    public static float[][] generateSimplexNoise(int width, int height){
+    public float[][] generateSimplexNoise(int width, int height){
         float[][] simplexnoise = new float[width][height];
         float frequency = 5.0f / (float) width;
 
@@ -372,20 +373,20 @@ public class SimplexNoise {  // Simplex noise in 2D, 3D and 4D
         return simplexnoise;
     }
 
-    public static void main(String[] args)
+    public void main(String[] args)
     {
         int width = 512;
         int height = 512;
 
         BufferedImage image;
-
         float[][] map = generateSimplexNoise(512, 512);
 
         JFrame frame = new JFrame();
 
         frame.setVisible(true);
 
-        frame.add(new JLabel(new ImageIcon(getImage(map))));
+
+        frame.add(new JLabel(new ImageIcon(getImage(convert(map)))));
 
         frame.pack();
 //      frame.setSize(WIDTH, HEIGHT);
@@ -394,28 +395,42 @@ public class SimplexNoise {  // Simplex noise in 2D, 3D and 4D
 
     }
 
-    public static BufferedImage getImage(float[][] img)
+    public int[][] convert(float[][] img)
     {
-        BufferedImage image = new BufferedImage(img.length, img[0].length, BufferedImage.TYPE_INT_RGB);
-        double[][] map = new double[img.length][img[0].length];
+        int[][] map = new int[img.length][img[0].length];
         for(int i = 0; i < img.length; i++)
         {
             for(int j = 0; j < img[0].length; j++)
             {
-                map[i][j] = img[i][j]*100;
+                map[i][j] = (int)(img[i][j]*100);
                 //System.out.println("Map: " + map[i][j]);
             }
         }
+        return map;
+    }
 
+    public BufferedImage getImage(int[][] map)
+    {
+        BufferedImage image = new BufferedImage(map.length, map[0].length, BufferedImage.TYPE_INT_RGB);
 
-        for(int x = 0; x < img.length; x++) {
-            for(int y = 0; y < img[0].length; y++) {
+        int red = new Color(255, 0, 0).getRGB();
+        int blue = new Color(0, 0, 255).getRGB();
+        int green = new Color(0, 255, 0).getRGB();
+
+        for(int x = 0; x < map.length; x++) {
+            for(int y = 0; y < map[0].length; y++) {
                 int rgb = (int)(map[x][y])<<16 | (int)(map[x][y]) << 8 | ((int)map[x][y]);
-                System.out.println("RGB: " + rgb);
-                image.setRGB(x, y, rgb);
+                //System.out.println("RGB: " + rgb);
+                if(rgb > 4000000)
+                    image.setRGB(x, y, blue);
+                else if(rgb < 1700000)
+                    image.setRGB(x, y, red);
+                else
+                    image.setRGB(x, y, green);
             }
         }
         System.out.println("RGB Example: " + new Color(20, 255, 10).getRGB());
+        System.out.println("P Size: " + p.length);
         return image;
     }
 }
