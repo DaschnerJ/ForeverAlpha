@@ -23,19 +23,8 @@ import java.awt.image.BufferedImage;
 import java.util.Random;
 
 public class SimplexNoise {  // Simplex noise in 2D, 3D and 4D
-    private Grad grad3[] = {new Grad(1,1,0),new Grad(-1,1,0),new Grad(1,-1,0),new Grad(-1,-1,0),
-            new Grad(1,0,1),new Grad(-1,0,1),new Grad(1,0,-1),new Grad(-1,0,-1),
-            new Grad(0,1,1),new Grad(0,-1,1),new Grad(0,1,-1),new Grad(0,-1,-1)};
-
-    private Grad grad4[]= {new Grad(0,1,1,1),new Grad(0,1,1,-1),new Grad(0,1,-1,1),new Grad(0,1,-1,-1),
-            new Grad(0,-1,1,1),new Grad(0,-1,1,-1),new Grad(0,-1,-1,1),new Grad(0,-1,-1,-1),
-            new Grad(1,0,1,1),new Grad(1,0,1,-1),new Grad(1,0,-1,1),new Grad(1,0,-1,-1),
-            new Grad(-1,0,1,1),new Grad(-1,0,1,-1),new Grad(-1,0,-1,1),new Grad(-1,0,-1,-1),
-            new Grad(1,1,0,1),new Grad(1,1,0,-1),new Grad(1,-1,0,1),new Grad(1,-1,0,-1),
-            new Grad(-1,1,0,1),new Grad(-1,1,0,-1),new Grad(-1,-1,0,1),new Grad(-1,-1,0,-1),
-            new Grad(1,1,1,0),new Grad(1,1,-1,0),new Grad(1,-1,1,0),new Grad(1,-1,-1,0),
-            new Grad(-1,1,1,0),new Grad(-1,1,-1,0),new Grad(-1,-1,1,0),new Grad(-1,-1,-1,0)};
-
+    private Grad grad3[];
+    private Grad grad4[];
     private short p[] = new short[256];
     // To remove the need for index wrapping, double the permutation table length
     private short perm[] = new short[512];
@@ -44,6 +33,8 @@ public class SimplexNoise {  // Simplex noise in 2D, 3D and 4D
     private int seed;
 
     public SimplexNoise(int seed){
+//        System.out.println("Grad3: " + grad3.length);
+        //System.out.println("Grad4: " + grad4.length);
         this.seed = seed;
         Random r = new Random(seed);
         for(int i = 0; i < 256; i++)
@@ -51,6 +42,25 @@ public class SimplexNoise {  // Simplex noise in 2D, 3D and 4D
             short x = (short)r.nextInt(255);
             p[i] = x;
             //System.out.println("Number picked: " + x);
+        }
+
+        grad3 = new Grad[12];
+        for(int i = 0; i < 12; i++)
+        {
+            short x = (short)(r.nextInt(3)-1);
+            short y = (short)(r.nextInt(3)-1);
+            short z = (short)(r.nextInt(3)-1);
+            grad3[i] = new Grad(x, y, z);
+        }
+
+        grad4 = new Grad[32];
+        for(int i = 0; i < 12; i++)
+        {
+            short x = (short)(r.nextInt(3)-1);
+            short y = (short)(r.nextInt(3)-1);
+            short z = (short)(r.nextInt(3)-1);
+            short w = (short)(r.nextInt(3)-1);
+            grad4[i] = new Grad(x, y, z, w);
         }
 
         for(int i=0; i<512; i++)

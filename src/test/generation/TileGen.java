@@ -34,29 +34,30 @@ public class TileGen {
 
     public int[][] addTile(int[][] map, int mapID, long seed)
     {
-        Random r = new Random(seed + mapID);
-        replaceable.forEach(x ->
-        {
-            System.out.println("Replacable int: " + x);
-        });
-        for(int i = 0; i < density; i++)
+        Random r = new Random(seed + mapID + id);
+//        replaceable.forEach(x ->
+//        {
+//            //System.out.println("Replacable int: " + x);
+//        });
+        int diff = r.nextInt(max*2)+min*2;
+        for(int i = 0; i < diff; i++)
         {
             int x = r.nextInt(map.length);
             int y = r.nextInt(map[0].length);
-            System.out.println("Trying to replace: " + map[x][y]);
+            //System.out.println("Trying to replace: " + map[x][y]);
             if(replaceable.contains(map[x][y]))
             {
                 map[x][y] = id;
-                map = expandTile(map, mapID, seed, x, y);
+                map = expandTile(map, mapID, seed, x, y, r);
             }
         }
         return map;
 
     }
 
-    public int[][] expandTile(int[][] map, int mapID, long seed, int x, int y)
+    public int[][] expandTile(int[][] map, int mapID, long seed, int x, int y, Random r)
     {
-        Random r = new Random(seed + mapID);
+        //Random r = new Random(seed + mapID);
         int xP = x;
         int yP = y;
         int dense = r.nextInt(density);
@@ -74,7 +75,8 @@ public class TileGen {
             }
             xP += diffX;
             yP += diffY;
-            map[xP][yP] = id;
+            if(replaceable.contains(map[xP][yP]))
+                map[xP][yP] = id;
         }
         return map;
     }
